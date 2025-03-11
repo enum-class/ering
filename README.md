@@ -1,11 +1,13 @@
 # Ering
-Ering is a step-by-step implementation of a lock-free, single-producer, single-consumer, fixed-size FIFO queue
+Ering is a step-by-step implementation of a lock-free, single-producer, single-consumer, fixed-size ring
+
+Highly inspired from [Charles Frasch](https://github.com/CharlesFrasch/cppcon2023) and [Erik Rigtorp](https://github.com/rigtorp/SPSCQueue) works.
 
 ## Step 1: Simple Unsafe Circular Ring
 The first step implements a basic, non-thread-safe circular buffer in C.
 
 <div align="center">
-<img src="img/ring.jpg" alt="ring" width="350">
+<img src="img/ring.jpg" alt="ring" width="500">
 </div>
 
 ### Code
@@ -47,7 +49,7 @@ In this step, I introduce atomic operations to make the FIFO queue safe for a si
 Together, acquire-release pairing establishes a happens-before relationship
 
 <!-- <div align="center">
-<img src="img/sec.jpg" alt="ring" width="350">
+<img src="img/sec.jpg" alt="ring" width="500">
 </div> -->
 
 ### Code
@@ -96,7 +98,7 @@ typedef struct {
 ```
 
 ## Step 4: Optimizing Cursor Reads with Caching
-In this step, I optimized the ring by reducing unnecessary atomic reads of the opposing thread’s cursor.
+In this step, by inspiring from Erik Rigtorp's SPSCQueue, I optimized the ring by reducing unnecessary atomic reads of the opposing thread’s cursor.
 
 In the previous step, the producer always read pop_cursor (via __atomic_load) on every ering_push call to check if the queue was full, and the consumer always read push_cursor on every ering_pop call to check if it was empty. However:
 
@@ -198,6 +200,9 @@ Even though the thread sanitizer flags issues with step1 unsafe ring (as it’s 
 
 Below are the results:
 
+<div align="center">
+<img src="img/bar.png" alt="ring" width="500">
+</div>
 
 ## System Preparation
 
