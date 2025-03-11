@@ -3,6 +3,13 @@ Ering is a step-by-step implementation of a lock-free, single-producer, single-c
 
 Highly inspired from [Charles Frasch](https://github.com/CharlesFrasch/cppcon2023) and [Erik Rigtorp](https://github.com/rigtorp/SPSCQueue) works.
 
+**Build the project**
+
+```bash
+cmake -B build
+cmake --build build
+```
+
 ## Step 1: Simple Unsafe Circular Ring
 The first step implements a basic, non-thread-safe circular buffer in C.
 
