@@ -199,6 +199,54 @@ Even though the thread sanitizer flags issues with step1 unsafe ring (as it’s 
 Below are the results:
 
 
-## System Prepration
+## System Preparation
 
-## System configuration
+To ensure reliable and fair evaluations, the first step is setting up a stable and dedicated environment. This means minimizing factors that could influence performance results in any benchmarking process. The provided [guide](https://easyperf.net/blog/2019/08/02/Perf-measurement-environment-on-Linux) explains how to set up a consistent Linux environment effectively.
+
+**The following commands are executed:**
+
+```bash
+echo performance | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor
+```
+- **What it does**: Sets the CPU frequency scaling governor to "performance" mode for all CPU cores. This locks the CPU frequency to its maximum value (1.90GHz for the Intel i5-4300U) rather than allowing dynamic scaling (e.g., powersave or ondemand modes).
+
+- **Why it works**: Dynamic frequency scaling can cause performance fluctuations during benchmarks due to the CPU adjusting its clock speed based on load. By forcing a constant maximum frequency, we eliminate this variability, ensuring consistent execution times for push and pop operations in the FIFO queue.
+
+```bash
+echo 1 | sudo tee /sys/devices/system/cpu/intel_pstate/no_turbo
+```
+- **What it does**: Disables Intel Turbo Boost, which temporarily increases CPU frequency beyond the base clock (up to ~2.5GHz for the i5-4300U) under high load.
+
+- **Why it works**: Turbo Boost introduces non-deterministic performance spikes, making benchmark results less predictable. Disabling it ensures the CPU runs at a stable 1.90GHz, providing a controlled environment where performance depends solely on the code and not transient boosts.
+
+```bash
+echo off | sudo tee /sys/devices/system/cpu/smt/control
+```
+- **What it does**: Disables Simultaneous Multithreading (SMT), also known as Hyper-Threading, on the system. The Intel i5-4300U has 2 threads per core, so this reduces the 4 logical CPUs to 2 physical cores.
+
+- **Why it works**: Hyper-Threading can lead to resource contention and uneven workload distribution between threads. Disabling it ensures that the producer and consumer threads run on dedicated physical cores, reducing interference and providing more consistent latency and throughput measurements. This aligns with the SPSC design goal of isolating the two threads.
+
+I have used `bind_cpu` function to pin each thread to specific core.
+```c
+int bind_cpu(int core) {
+    cpu_set_t mask;
+    CPU_ZERO(&mask);
+    CPU_SET(core, &mask);
+    return sched_setaffinity(0, sizeof(mask), &mask);
+}
+```
+
+## System Configuration
+
+This section details the hardware configuration used for benchmarking and testing the Ering implementation to ensure consistent and accurate results.
+
+- **Processor**: Intel(R) Core(TM) i5-4300U CPU @ 1.90GHz
+- **CPU(s)**: 4
+  - **On-line CPU(s) list**: 0-3
+  - **Thread(s) per core**: 2
+- **Caches (sum of all)**:
+  - **L1d**: 64 KiB (2 instances)
+  - **L1i**: 64 KiB (2 instances)
+  - **L2**: 512 KiB (2 instances)
+  - **L3**: 3 MiB (1 instance)
+- 4GB Ram and Run Ubuntu 24.04.2 LTS with kernel 6.8.0-55-generic
