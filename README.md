@@ -249,4 +249,7 @@ This section details the hardware configuration used for benchmarking and testin
   - **L1i**: 64 KiB (2 instances)
   - **L2**: 512 KiB (2 instances)
   - **L3**: 3 MiB (1 instance)
-- 4GB Ram and Run Ubuntu 24.04.2 LTS with kernel 6.8.0-55-generic
+- 4GB RAM
+- Run Ubuntu 24.04.2 LTS with kernel 6.8.0-55-generic
+- gcc-13.3.0
+- clang-18.1.3

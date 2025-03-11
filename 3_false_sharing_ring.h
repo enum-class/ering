@@ -24,6 +24,17 @@ int ering_init(Ering *const ring, unsigned int capacity) {
     return 1;
 }
 
+Ering* ering_new(unsigned int capacity) {
+    Ering* ring = malloc(sizeof(Ering) + capacity * sizeof(void *));
+    if (!ring)
+        return NULL;
+    ring->capacity = capacity;
+    ring->push_cursor = 0;
+    ring->pop_cursor = 0;
+    ring->ring = (void**)((char*)ring + sizeof(Ering));
+    return ring;
+}
+
 void ering_release(Ering *const ring) {
     if (!ring)
         return;

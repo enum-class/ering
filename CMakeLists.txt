@@ -5,7 +5,7 @@ project(ERing C)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED On)
 
-add_compile_options(-Wall -Wextra -pedantic -Werror)
+add_compile_options(-Wall -Wextra -pedantic -Werror -Wno-strict-prototypes)
 
 # unsafe_ring
 add_executable(unsafe_unittests unit_tests.c)

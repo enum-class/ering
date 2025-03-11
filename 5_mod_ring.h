@@ -35,10 +35,27 @@ int ering_init(Ering *const ring, unsigned int capacity) {
     ring->mask = ring->capacity - 1;
     ring->push_cursor = 0;
     ring->pop_cursor = 0;
+    ring->cached_push_cursor = 0;
+    ring->cached_pop_cursor = 0;
     ring->ring = malloc(ring->capacity * sizeof(void *));
     if (!ring->ring)
         return 0;
     return 1;
+}
+
+Ering* ering_new(unsigned int capacity) {
+    unsigned int cap = align32pow2(capacity);
+    Ering* ring = malloc(sizeof(Ering) + cap * sizeof(void *));
+    if (!ring)
+        return NULL;
+    ring->capacity = cap;
+    ring->mask = cap - 1;
+    ring->push_cursor = 0;
+    ring->pop_cursor = 0;
+    ring->cached_push_cursor = 0;
+    ring->cached_pop_cursor = 0;
+    ring->ring = (void**)((char*)ring + sizeof(Ering));
+    return ring;
 }
 
 void ering_release(Ering *const ring) {

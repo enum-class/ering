@@ -108,14 +108,18 @@ void *consume(void *const data) {
     pthread_exit(NULL);
 }
 
+Ering ring;
+
 int main() {
-    Ering ring;
-    ering_init(&ring, BUFFER_SIZE);
+    //Ering* r = ering_new(BUFFER_SIZE);
+    Ering* r = &ring;
+
+    ering_init(r, BUFFER_SIZE);
 
     pthread_t producer, consumer;
     
-    pthread_create(&producer, NULL, &produce, &ring);
-    pthread_create(&consumer, NULL, &consume, &ring);
+    pthread_create(&producer, NULL, &produce, r);
+    pthread_create(&consumer, NULL, &consume, r);
     pthread_join(producer, NULL);
     pthread_join(consumer, NULL);
 
@@ -124,5 +128,6 @@ int main() {
     printf("Execution time: %f seconds\n", execution_sec);
     printf("Operations per second: %.2f\n", operations_per_sec);
 
-    ering_release(&ring);
+    ering_release(r);
+    //free(r);
 }
