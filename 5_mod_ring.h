@@ -25,10 +25,11 @@ typedef struct {
 
     unsigned int capacity;
     unsigned int mask;
-    void** ring;
+    void **ring;
 } __attribute__((aligned(CACHE_LINE_SIZE))) Ering;
 
-int ering_init(Ering *const ring, unsigned int capacity) {
+int ering_init(Ering *const ring, unsigned int capacity)
+{
     if (!ring)
         return 0;
     ring->capacity = align32pow2(capacity);
@@ -43,9 +44,10 @@ int ering_init(Ering *const ring, unsigned int capacity) {
     return 1;
 }
 
-Ering* ering_new(unsigned int capacity) {
+Ering *ering_new(unsigned int capacity)
+{
     unsigned int cap = align32pow2(capacity);
-    Ering* ring = malloc(sizeof(Ering) + cap * sizeof(void *));
+    Ering *ring = malloc(sizeof(Ering) + cap * sizeof(void *));
     if (!ring)
         return NULL;
     ring->capacity = cap;
@@ -54,11 +56,12 @@ Ering* ering_new(unsigned int capacity) {
     ring->pop_cursor = 0;
     ring->cached_push_cursor = 0;
     ring->cached_pop_cursor = 0;
-    ring->ring = (void**)((char*)ring + sizeof(Ering));
+    ring->ring = (void **)((char *)ring + sizeof(Ering));
     return ring;
 }
 
-void ering_release(Ering *const ring) {
+void ering_release(Ering *const ring)
+{
     if (!ring)
         return;
     if (ring->ring)
@@ -67,9 +70,11 @@ void ering_release(Ering *const ring) {
     ring->pop_cursor = 0;
 }
 
-int ering_push(Ering *const ring, void *const value) {
+int ering_push(Ering *const ring, void *const value)
+{
     if (ring->push_cursor - ring->cached_pop_cursor == ring->capacity) {
-        __atomic_load(&ring->pop_cursor, &ring->cached_pop_cursor,  __ATOMIC_ACQUIRE);
+        __atomic_load(&ring->pop_cursor, &ring->cached_pop_cursor,
+                      __ATOMIC_ACQUIRE);
         if (ring->push_cursor - ring->cached_pop_cursor == ring->capacity) {
             return 0;
         }
@@ -79,9 +84,11 @@ int ering_push(Ering *const ring, void *const value) {
     return 1;
 }
 
-int ering_pop(Ering *const ring, void **const value) {
+int ering_pop(Ering *const ring, void **const value)
+{
     if (ring->cached_push_cursor - ring->pop_cursor == 0) {
-        __atomic_load(&ring->push_cursor, &ring->cached_push_cursor,  __ATOMIC_ACQUIRE);
+        __atomic_load(&ring->push_cursor, &ring->cached_push_cursor,
+                      __ATOMIC_ACQUIRE);
         if (ring->cached_push_cursor - ring->pop_cursor == 0) {
             return 0;
         }

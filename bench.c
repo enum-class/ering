@@ -45,7 +45,8 @@ int bind_cpu(int core)
     return sched_setaffinity(0, sizeof(mask), &mask);
 }
 
-void *produce(void *const data) {
+void *produce(void *const data)
+{
     if (bind_cpu(0) != 0) {
         printf("PRODUCER FAILED\n");
         pthread_exit(NULL);
@@ -76,19 +77,19 @@ void *produce(void *const data) {
     pthread_exit(NULL);
 }
 
-
-void *consume(void *const data) {
+void *consume(void *const data)
+{
     if (bind_cpu(2) != 0) {
         printf("CONSUMER FAILED\n");
         pthread_exit(NULL);
     }
 
     Ering *const ring = (Ering *const)data;
-    int* pointer = NULL;
+    int *pointer = NULL;
     int idx = 0;
 
     for (unsigned int i = 0; i < WARM_SIZE;) {
-        if (ering_pop(ring, (void**)&pointer)) {
+        if (ering_pop(ring, (void **)&pointer)) {
             idx = i & 15;
             result[idx] = *pointer;
             ++i;
@@ -98,7 +99,7 @@ void *consume(void *const data) {
     trigger = 1;
 
     for (unsigned int i = 0; i < TEST_SIZE;) {
-        if (ering_pop(ring, (void**)&pointer)) {
+        if (ering_pop(ring, (void **)&pointer)) {
             idx = i & 15;
             result[idx] = *pointer;
             ++i;
@@ -110,20 +111,22 @@ void *consume(void *const data) {
 
 Ering ring;
 
-int main() {
+int main()
+{
     //Ering* r = ering_new(BUFFER_SIZE);
-    Ering* r = &ring;
+    Ering *r = &ring;
 
     ering_init(r, BUFFER_SIZE);
 
     pthread_t producer, consumer;
-    
+
     pthread_create(&producer, NULL, &produce, r);
     pthread_create(&consumer, NULL, &consume, r);
     pthread_join(producer, NULL);
     pthread_join(consumer, NULL);
 
-    double execution_sec = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
+    double execution_sec =
+        (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec) / 1e9;
     double operations_per_sec = TEST_SIZE / execution_sec;
     printf("Execution time: %f seconds\n", execution_sec);
     printf("Operations per second: %.2f\n", operations_per_sec);

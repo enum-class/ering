@@ -15,19 +15,23 @@
 #error "A header should be defined"
 #endif
 
-int size(Ering* ring) {
+int size(Ering *ring)
+{
     return ring->push_cursor - ring->pop_cursor;
 }
 
-int is_empty(Ering* ring) {
+int is_empty(Ering *ring)
+{
     return size(ring) == 0;
 }
 
-int is_full(Ering* ring) {
+int is_full(Ering *ring)
+{
     return (unsigned int)size(ring) == ring->capacity;
 }
 
-void test_init() {
+void test_init()
+{
     Ering ring;
 
     assert(ering_init(&ring, 1024));
@@ -37,17 +41,18 @@ void test_init() {
     ering_release(&ring);
 }
 
-void test_push_pop() {
+void test_push_pop()
+{
     Ering ring;
-    int values[3] = {1, 2, 3};
-    int* pointer = NULL;
-    
+    int values[3] = { 1, 2, 3 };
+    int *pointer = NULL;
+
     // push
     assert(ering_init(&ring, 3));
     assert(size(&ring) == 0);
     assert(is_empty(&ring));
     assert(!is_full(&ring));
-    
+
     assert(ering_push(&ring, &values[0]));
     assert(size(&ring) == 1);
     assert(!is_empty(&ring));
@@ -65,31 +70,31 @@ void test_push_pop() {
     assert(is_full(&ring));
     assert(!ering_push(&ring, &values[0]));
 #endif
-    
+
     // pop
-    assert(ering_pop(&ring, (void**)&pointer));
+    assert(ering_pop(&ring, (void **)&pointer));
     assert(*pointer == 1);
     assert(size(&ring) == 2);
     assert(!is_empty(&ring));
     assert(!is_full(&ring));
 
-    assert(ering_pop(&ring, (void**)&pointer));
+    assert(ering_pop(&ring, (void **)&pointer));
     assert(*pointer == 2);
     assert(size(&ring) == 1);
     assert(!is_empty(&ring));
     assert(!is_full(&ring));
 
-    assert(ering_pop(&ring, (void**)&pointer));
+    assert(ering_pop(&ring, (void **)&pointer));
     assert(*pointer == 3);
     assert(size(&ring) == 0);
     assert(is_empty(&ring));
     assert(!is_full(&ring));
 
-    assert(!ering_pop(&ring, (void**)&pointer));
-    
+    assert(!ering_pop(&ring, (void **)&pointer));
+
     for (int i = 0; i < 10; ++i) {
         assert(ering_push(&ring, &values[i % 3]));
-        assert(ering_pop(&ring, (void**)&pointer));
+        assert(ering_pop(&ring, (void **)&pointer));
         assert(*pointer == values[i % 3]);
         assert(is_empty(&ring));
     }
@@ -97,7 +102,8 @@ void test_push_pop() {
     ering_release(&ring);
 }
 
-int main() {
+int main()
+{
     test_init();
     test_push_pop();
 
