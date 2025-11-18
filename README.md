@@ -265,3 +265,5 @@ This section details the hardware configuration used for benchmarking and testin
 - Run Ubuntu 24.04.2 LTS with kernel 6.8.0-55-generic
 - gcc-13.3.0
 - clang-18.1.3
+
+[View the page →](https://htmlpreview.github.io/?https://github.com/enum-class/ering/blob/main/docs/index.html)
